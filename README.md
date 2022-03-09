@@ -42,6 +42,11 @@ This repository contains vertex and uv texture map.
 - use [--label] will save save image label of each face in mesh
 
 # Examples
+
+## original mesh
+
+-  <img src="./statics/original.png" width = "300"/>
+
 ## vertex map
 - weight-mean
   
