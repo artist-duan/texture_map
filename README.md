@@ -27,7 +27,7 @@ This repository contains vertex and uv texture map.
 
 ## vertex texture map: Fast
 
-- include ``min_depth``, ``best view``, ``mean view``, ``weight-mean view`` and ``optimization``(implement by open3d) vertex texture map
+- include ``min_depth``, ``best view``, ``mean view``, ``weight-mean view`` and ``optimization``(implement use open3d) vertex texture map
 
 - ```python vertex_map_example.py --path PATH_TO_DATA --mesh NAME_OF_MESH [--depth PATH_TO_DEPTH] [--display]```
 
@@ -35,7 +35,7 @@ This repository contains vertex and uv texture map.
 
 ## uv map: Slow but performance is great
 
-- include ``best view``, ``max projection area`` and ``graph optimization``(implement by [graph-optimzation](https://github.com/DIYer22/graph_optimization)) uv map
+- include ``best view``, ``max projection area`` and ``graph optimization``(optim-algorithm implemented by [graph-optimzation](https://github.com/DIYer22/graph_optimization)) uv map
 
 - ```python uv_map_example.py --path PATH_TO_DATA --mesh NAME_OF_MESH [--depth PATH_TO_DEPTH] [--display] [--label]```
 
