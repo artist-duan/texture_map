@@ -1,0 +1,8 @@
+numpy
+scipy
+tqdm
+opencv_python
+opencv_contrib_python
+trimesh
+pyrender
+open3d
