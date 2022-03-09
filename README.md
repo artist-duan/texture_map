@@ -9,8 +9,8 @@ This repository contains vertex and uv texture map.
 - [x] uv map
   - [x] Max Projection Area
   - [x] Graph Optimization
-  - [] Color Adjustment
-  - [] Photo-Consistency Check(occlude)
+  - [ ] Color Adjustment
+  - [ ] Photo-Consistency Check(occlude)
 
 # Installation
 
