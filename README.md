@@ -14,7 +14,9 @@ This repository contains vertex and uv texture map.
 
 # Installation
 
-- ``pip install -r requirements.txt ``
+- ```pip install -r requirements.txt ```
+
+- ```https://github.com/js-duan/texture_map.git```
 
 # Data
 
