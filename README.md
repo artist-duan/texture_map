@@ -41,7 +41,7 @@ This repository contains vertex and uv texture map.
 
 - ```python uv_map_example.py --path PATH_TO_DATA --mesh NAME_OF_MESH [--depth PATH_TO_DEPTH] [--display] [--label]```
 
-- use [--label] will save save image label of each face in mesh
+- use [--label] will save image label of each face in mesh
 
 # Examples
 
