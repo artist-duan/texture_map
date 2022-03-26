@@ -1,5 +1,66 @@
+import os
+import cv2
 import numpy as np
+import open3d as o3d
 from tqdm import tqdm
+
+
+def read_poses(path, num):
+    data = np.load(path)
+    intrinsic = None
+    poses = []
+    for i in range(num):
+        intrinsic = data[f"camera_mat_{i}"]
+        world_mat = data[f"world_mat_{i}"]
+        pose = np.linalg.inv(intrinsic) @ world_mat
+        poses.append(pose)
+    poses = np.array(poses)
+    return intrinsic, poses
+
+
+def save_texture_mesh(
+    vertices,
+    triangles,
+    triangle_uvs,
+    triangle_ids,
+    texture_imgs,
+    images=None,
+    save_path=None,
+    name=None,
+    save_label=None,
+):
+    mesh = o3d.geometry.TriangleMesh()
+    mesh.vertices = o3d.utility.Vector3dVector(vertices)
+    mesh.triangles = o3d.utility.Vector3iVector(triangles)
+    mesh.triangle_uvs = o3d.utility.Vector2dVector(triangle_uvs)
+    mesh.triangle_material_ids = o3d.utility.IntVector(triangle_ids)
+    mesh.textures = texture_imgs
+
+    if save_path:
+        os.makedirs(save_path, exist_ok=True)
+        o3d.io.write_triangle_mesh(os.path.join(save_path, f"{name}.obj"), mesh)
+        if images:
+            for i, img in enumerate(images):
+                img = cv2.imread(img)
+                cv2.imwrite(os.path.join(save_path, f"{name}_{i}.png"), img[::-1, :, :])
+
+    if save_label:
+        os.makedirs(save_label, exist_ok=True)
+        o3d.io.write_triangle_mesh(os.path.join(save_label, f"{name}.obj"), mesh)
+        if images:
+            h, w, _ = cv2.imread(images[0]).shape
+            for i in range(len(images)):
+                color = (
+                    np.random.randint(0, 256),
+                    np.random.randint(0, 256),
+                    np.random.randint(0, 256),
+                )
+                color = np.tile(np.array(color).reshape((1, 1, 3)), (h, w, 1)).astype(
+                    np.uint8
+                )
+                cv2.imwrite(
+                    os.path.join(save_label, f"{name}_{i}.png"), color[::-1, :, :]
+                )
 
 
 def heron_formula(us, vs):
@@ -85,3 +146,44 @@ def gen_affinity(
     areas = np.array(areas, dtype=np.float32)
     probs = np.array(probs, dtype=np.float32)
     return rows, cols, labels, distances, probs, areas
+
+
+def gen_camera(size=100, color=[1, 0, 0]):
+    verts = [
+        [0, 0, 0],
+        [3 * size / 4, size / 2, size],
+        [3 * size / 4, -size / 2, size],
+        [-3 * size / 4, -size / 2, size],
+        [-3 * size / 4, size / 2, size],
+    ]
+    verts = np.array(verts, dtype=np.float64)
+    colors = np.array([color for _ in range(verts.shape[0])])
+
+    triangles = [[0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 1], [4, 3, 2], [4, 2, 1]]
+    triangles = np.array(triangles, dtype=np.int32)
+
+    mesh = o3d.geometry.TriangleMesh()
+    mesh.vertices = o3d.utility.Vector3dVector(verts)
+    mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
+    mesh.triangles = o3d.utility.Vector3iVector(triangles)
+
+    return mesh
+
+
+def pose_camera(Ts, size=100, color=[1, 0, 0]):
+    M = None
+    for i, T in enumerate(Ts):
+        if i == 0:
+            mesh = gen_camera(size, [0, 1, 0])
+        elif i == len(Ts) - 1:
+            mesh = gen_camera(size, [0, 0, 1])
+        elif i == 10:
+            mesh = gen_camera(size, [0, 0, 1])
+        else:
+            mesh = gen_camera(size, color)
+        mesh.transform(T)
+        if M is None:
+            M = mesh
+        else:
+            M += mesh
+    return M

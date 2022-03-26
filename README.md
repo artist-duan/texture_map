@@ -9,6 +9,8 @@ This repository contains vertex and uv texture map.
 - [x] uv map
   - [x] Max Projection Area
   - [x] Graph Optimization
+  - [x] 2022.03.27 Add mesh downsample by open3d to save memory and time
+  - [x] 2022.03.27 Add pose uniform downsample to improve texture performance 
   - [ ] Color Adjustment
   - [ ] Photo-Consistency Check(occlude)
 
@@ -39,9 +41,13 @@ This repository contains vertex and uv texture map.
 
 - include ``best view``, ``max projection area`` and ``graph optimization``(optim-algorithm implemented by [graph-optimzation](https://github.com/DIYer22/graph_optimization)) uv map
 
-- ```python uv_map_example.py --path PATH_TO_DATA --mesh NAME_OF_MESH [--depth PATH_TO_DEPTH] [--display] [--label]```
+- ```python uv_map_example.py --path PATH_TO_DATA --mesh NAME_OF_MESH [--depth PATH_TO_DEPTH] [--display] [--label] [--downsample_pose] [--downsample_mesh] [--ratio 2]```
 
 - use [--label] will save image label of each face in mesh
+
+- use [--downsample_pose] to downsample texture images
+
+- use [--downsample_mesh] [--ratio 2] will downsample mesh by ratio times 
 
 # Examples
 
