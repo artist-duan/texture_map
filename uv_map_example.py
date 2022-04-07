@@ -20,6 +20,7 @@ def texturing(
     method="graph_optim",
     downsamplepose=True,
     downsamplemesh=False,
+    count=40,
     ratio=2,
 ):
     """load mesh"""
@@ -53,7 +54,7 @@ def texturing(
 
     """ downsample """
     if downsamplepose:
-        indexs = downsample_pose(poses)
+        indexs = downsample_pose(poses, count=count)
         poses = poses[indexs]
         images = [images[i] for i in indexs]
         images.sort()
@@ -168,5 +169,6 @@ if __name__ == "__main__":
         args.method,
         downsamplepose=args.downsample_pose,
         downsamplemesh=args.downsample_mesh,
+        count=40,
         ratio=args.ratio,
     )

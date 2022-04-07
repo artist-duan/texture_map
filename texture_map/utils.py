@@ -68,7 +68,7 @@ def heron_formula(us, vs):
     b = ((us[0] - us[2]) ** 2 + (vs[0] - vs[2]) ** 2) ** (1 / 2)
     c = ((us[1] - us[2]) ** 2 + (vs[1] - vs[2]) ** 2) ** (1 / 2)
     p = (a + b + c) / 2
-    s = (p * (p - a) * (p - b) * (p - c)) ** (1 / 2)
+    s = max((p * (p - a) * (p - b) * (p - c)), 0) ** (1 / 2)
     return s
 
 

@@ -28,7 +28,10 @@ def downsample_mesh(path, ratio=2):
 
 
 def downsample_pose(poses, count=20):
-    count = min(count, len(poses) // 2)
+    if len(poses) <= count:
+        return [i for i in range(len(poses))]
+    # count = min(count, len(poses))
+
     poses = np.array([np.linalg.inv(pose) for pose in poses])
 
     first = np.random.randint(0, len(poses))
