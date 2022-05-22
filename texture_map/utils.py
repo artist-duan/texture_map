@@ -80,7 +80,7 @@ def softmax(data, coefficient=1.0):
 
 
 def KLDivergence(p, q):
-    return -np.sum(p * np.log(q)) + np.sum(p * np.log(p))
+    return -np.sum(p * np.log(q + 1e-5)) + np.sum(p * np.log(p + 1e-5))
 
 
 def gen_affinity(

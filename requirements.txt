@@ -6,3 +6,7 @@ opencv_contrib_python
 trimesh
 pyrender
 open3d
+pymeshfix
+pyvista
+
+

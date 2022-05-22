@@ -48,6 +48,32 @@ def find_visible(
         cos = np.sum(directs * triangle_normals, axis=-1) / (norms1 * norms2)
         angles = np.degrees(np.arccos(cos))
 
+        ds = ds.reshape((-1, 3))
+        us, vs = us.reshape((-1, 3)), vs.reshape((-1, 3))
+        cond1 = np.logical_and(us[:, 0] < W, us[:, 0] >= 0)
+        cond2 = np.logical_and(us[:, 1] < W, us[:, 1] >= 0)
+        cond3 = np.logical_and(us[:, 2] < W, us[:, 2] >= 0)
+        cond4 = np.logical_and(vs[:, 0] < H, vs[:, 0] >= 0)
+        cond5 = np.logical_and(vs[:, 1] < H, vs[:, 1] >= 0)
+        cond6 = np.logical_and(vs[:, 2] < H, vs[:, 2] >= 0)
+        cond = np.logical_and(
+            cond6,
+            np.logical_and(
+                cond5,
+                np.logical_and(
+                    cond4, np.logical_and(cond3, np.logical_and(cond1, cond2))
+                ),
+            ),
+        )
+        vs, us, ds = vs[cond], us[cond], ds[cond]
+        us, vs = us.reshape((-1,)), vs.reshape((-1,))
+
+        index = np.linspace(0, triangles.shape[0] - 1, triangles.shape[0]).astype(
+            np.int32
+        )
+        index = index[cond]
+        angles = angles[cond]
+
         # TODO: will modify to interpolate
         ds_ = depth[vs.astype(np.int32), us.astype(np.int32)]
         us, vs, ds, ds_ = (
@@ -58,12 +84,6 @@ def find_visible(
         )  # 3N -> Nx3
         ds *= 1000.0
 
-        cond1 = np.logical_and(us[:, 0] < W, us[:, 0] >= 0)
-        cond2 = np.logical_and(us[:, 1] < W, us[:, 1] >= 0)
-        cond3 = np.logical_and(us[:, 2] < W, us[:, 2] >= 0)
-        cond4 = np.logical_and(vs[:, 0] < H, vs[:, 0] >= 0)
-        cond5 = np.logical_and(vs[:, 1] < H, vs[:, 1] >= 0)
-        cond6 = np.logical_and(vs[:, 2] < H, vs[:, 2] >= 0)
         cond7 = ds[:, 0] >= 0
         cond8 = ds[:, 1] >= 0
         cond9 = ds[:, 2] >= 0
@@ -75,16 +95,7 @@ def find_visible(
         cond = np.logical_and(cond9, cond)
         cond = np.logical_and(cond8, cond)
         cond = np.logical_and(cond7, cond)
-        cond = np.logical_and(cond6, cond)
-        cond = np.logical_and(cond5, cond)
-        cond = np.logical_and(cond4, cond)
-        cond = np.logical_and(cond3, cond)
-        cond = np.logical_and(cond2, cond)
-        cond = np.logical_and(cond1, cond)
 
-        index = np.linspace(0, triangles.shape[0] - 1, triangles.shape[0]).astype(
-            np.int32
-        )
         index, us, vs, ds, ds_, angles = (
             index[cond],
             us[cond],

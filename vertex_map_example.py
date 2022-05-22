@@ -28,6 +28,80 @@ def save_texture_mesh(vertices, colors, triangles, save_path=None):
         o3d.io.write_triangle_mesh(save_path, mesh)
 
 
+def texturing(path, mesh_name, depth=None, display=False):
+    """load mesh"""
+    mesh = o3d.io.read_triangle_mesh(os.path.join(path, mesh_name))
+    mesh.compute_vertex_normals()
+    vertices = np.asarray(mesh.vertices)
+    triangles = np.asarray(mesh.triangles)
+    vertex_normals = np.asarray(mesh.vertex_normals)
+
+    """ images """
+    images = [
+        os.path.join(path, "image", img)
+        for img in os.listdir(os.path.join(path, "image"))
+        if img.endswith(".png")
+    ]
+    images.sort()
+
+    """ camera parameters """
+    intrinsic, poses = read_poses(os.path.join(path, "cameras_sphere.npz"), len(images))
+
+    """ depths """
+    if not depth:
+        depth = "depth"
+        depth_path = os.path.join(path, depth)
+        render_depth(
+            images,
+            intrinsic,
+            poses,
+            os.path.join(path, mesh_name),
+            depth_path,
+            display=display,
+        )
+
+    depths = [
+        os.path.join(path, depth, img)
+        for img in os.listdir(os.path.join(path, depth))
+        if img.endswith(".png")
+    ]
+    depths.sort()
+
+    os.makedirs(os.path.join(path, "textures"), exist_ok=True)
+
+    """ texture vertex """
+    # # min depth: don't need depth
+    # colors = texture_min_depth(
+    #     vertices, vertex_normals, intrinsic, poses, images, display=args.display
+    # )
+    # save_path = os.path.join(path, "textures", "min_depth.obj")
+    # save_texture_mesh(vertices, colors, triangles, save_path=save_path)
+
+    # visibles = find_visible(
+    #     images, depths, poses, intrinsic, vertices, vertex_normals, depth_threshold=5
+    # )
+
+    # # best normal and camera direction angle: need depth
+    # colors = texture_normal_best(visibles)
+    # save_path = os.path.join(path, "textures", "best.obj")
+    # save_texture_mesh(vertices, colors, triangles, save_path=save_path)
+
+    # # mean all: need depth
+    # colors = texture_normal_mean(visibles)
+    # save_path = os.path.join(path, "textures", "mean.obj")
+    # save_texture_mesh(vertices, colors, triangles, save_path=save_path)
+
+    # # weight mean all: need depth
+    # colors = texture_normal_weight_mean(visibles)
+    # save_path = os.path.join(path, "textures", "weight_mean.obj")
+    # save_texture_mesh(vertices, colors, triangles, save_path=save_path)
+
+    # optimzation in open3d
+    mesh = texture_optimzation(mesh, images, depths, intrinsic, poses, iteration=50)
+    save_path = os.path.join(path, "textures", "optim.ply")
+    o3d.io.write_triangle_mesh(save_path, mesh)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", type=str, default="./examples/qingfeng")
@@ -36,77 +110,4 @@ if __name__ == "__main__":
     parser.add_argument("--display", action="store_true")
     args = parser.parse_args()
 
-    """ load mesh """
-    mesh = o3d.io.read_triangle_mesh(os.path.join(args.path, args.mesh))
-    mesh.compute_vertex_normals()
-    vertices = np.asarray(mesh.vertices)
-    triangles = np.asarray(mesh.triangles)
-    vertex_normals = np.asarray(mesh.vertex_normals)
-
-    """ images """
-    images = [
-        os.path.join(args.path, "image", img)
-        for img in os.listdir(os.path.join(args.path, "image"))
-        if img.endswith(".png")
-    ]
-    images.sort()
-
-    """ camera parameters """
-    intrinsic, poses = read_poses(
-        os.path.join(args.path, "cameras_sphere.npz"), len(images)
-    )
-
-    """ depths """
-    depth = args.depth
-    if not depth:
-        depth = "depth"
-        depth_path = os.path.join(args.path, depth)
-        render_depth(
-            images,
-            intrinsic,
-            poses,
-            os.path.join(args.path, args.mesh),
-            depth_path,
-            display=args.display,
-        )
-
-    depths = [
-        os.path.join(args.path, depth, img)
-        for img in os.listdir(os.path.join(args.path, depth))
-        if img.endswith(".png")
-    ]
-    depths.sort()
-
-    os.makedirs(os.path.join(args.path, "textures"), exist_ok=True)
-
-    """ texture vertex """
-    # min depth: don't need depth
-    colors = texture_min_depth(
-        vertices, vertex_normals, intrinsic, poses, images, display=args.display
-    )
-    save_path = os.path.join(args.path, "textures", "min_depth.obj")
-    save_texture_mesh(vertices, colors, triangles, save_path=save_path)
-
-    visibles = find_visible(
-        images, depths, poses, intrinsic, vertices, vertex_normals, depth_threshold=5
-    )
-
-    # best normal and camera direction angle: need depth
-    colors = texture_normal_best(visibles)
-    save_path = os.path.join(args.path, "textures", "best.obj")
-    save_texture_mesh(vertices, colors, triangles, save_path=save_path)
-
-    # mean all: need depth
-    colors = texture_normal_mean(visibles)
-    save_path = os.path.join(args.path, "textures", "mean.obj")
-    save_texture_mesh(vertices, colors, triangles, save_path=save_path)
-
-    # weight mean all: need depth
-    colors = texture_normal_weight_mean(visibles)
-    save_path = os.path.join(args.path, "textures", "weight_mean.obj")
-    save_texture_mesh(vertices, colors, triangles, save_path=save_path)
-
-    # optimzation in open3d
-    mesh = texture_optimzation(mesh, images, depths, intrinsic, poses, iteration=10)
-    save_path = os.path.join(args.path, "textures", "optim.obj")
-    o3d.io.write_triangle_mesh(save_path, mesh)
+    texturing(args.path, args.mesh, args.depth, args.display)

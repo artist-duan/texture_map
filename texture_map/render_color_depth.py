@@ -11,7 +11,7 @@ def visualize_depth(depth, cmap=cv2.COLORMAP_JET):
     return x
 
 
-def render_depth(images, intrinsics, poses, mesh, depth_path, display=True):
+def render_depth(images, intrinsics, poses, mesh, depth_path=None, display=True):
     """
     images: list[PATH_TO_RGB]
     intrinsics: 3x3
@@ -32,7 +32,9 @@ def render_depth(images, intrinsics, poses, mesh, depth_path, display=True):
     camera = pyrender.camera.IntrinsicsCamera(fx, fy, cx, cy, znear=0.05, zfar=10000.0)
     light = pyrender.DirectionalLight(color=0.5 * np.ones(3), intensity=30)
 
-    os.makedirs(depth_path, exist_ok=True)
+    if depth_path is not None:
+        os.makedirs(depth_path, exist_ok=True)
+    depths = []
     for i in range(len(poses)):
         extrinsics = poses[i]
 
@@ -44,9 +46,10 @@ def render_depth(images, intrinsics, poses, mesh, depth_path, display=True):
         image, depth = render.render(scene)
         depth = depth * 1000.0
         show_depth = visualize_depth(depth)
-
+        depths.append(depth)
         img = images[i].split("/")[-1].split(".")[0]
-        cv2.imwrite(os.path.join(depth_path, img + ".png"), depth.astype(np.uint16))
+        if depth_path is not None:
+            cv2.imwrite(os.path.join(depth_path, img + ".png"), depth.astype(np.uint16))
         if display:
             cv2.imshow(
                 "color",
@@ -55,6 +58,8 @@ def render_depth(images, intrinsics, poses, mesh, depth_path, display=True):
                 ),
             )
             cv2.waitKey(10)
+    if depth_path is None:
+        return depths
 
 
 if __name__ == "__main__":
