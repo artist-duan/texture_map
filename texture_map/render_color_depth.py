@@ -79,7 +79,10 @@ if __name__ == "__main__":
     datas = np.load(os.path.join(path, args.camera))
 
     intrinsics = datas["camera_mat_0"].astype(np.float32)
-    images = [os.path.join(path, args.images, name) for name in os.listdir(os.path.join(path, args.images))]
+    images = [
+        os.path.join(path, args.images, name)
+        for name in os.listdir(os.path.join(path, args.images))
+    ]
     poses = []
     for i in range(len(images)):
         pose = datas[f"world_mat_{i}"]

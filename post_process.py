@@ -135,7 +135,7 @@ def main():
             mesh = o3d.io.read_triangle_mesh(
                 os.path.join(texture_mesh_path, "color.obj")
             )
-            vertices = np.asarray(mesh.vertices) * args.scale / 1000.0 / (2 ** 0.5)
+            vertices = np.asarray(mesh.vertices) * args.scale / 1000.0 / (2**0.5)
             mesh.vertices = o3d.utility.Vector3dVector(vertices)
             mesh.triangle_material_ids = o3d.utility.IntVector(
                 np.asarray(mesh.triangle_material_ids) - 1
@@ -152,7 +152,7 @@ def main():
         elif args.texture_map == "vertex":
             mesh_path = os.path.join(path, mesh_name)
             mesh = o3d.io.read_triangle_mesh(mesh_path)
-            vertices = np.asarray(mesh.vertices) * args.scale / 1000.0 / (2 ** 0.5)
+            vertices = np.asarray(mesh.vertices) * args.scale / 1000.0 / (2**0.5)
             mesh.vertices = o3d.utility.Vector3dVector(vertices)
             o3d.io.write_triangle_mesh(mesh_path, mesh)
         else:

@@ -5,10 +5,16 @@ import open3d as o3d
 from tqdm import tqdm
 
 
-def read_poses(path, num):
+def read_poses(path, num=-1):
     data = np.load(path)
     intrinsic = None
     poses = []
+
+    if num == -1:
+        num = 0
+        while f"camera_mat_{num}" in data:
+            num += 1
+
     for i in range(num):
         intrinsic = data[f"camera_mat_{i}"]
         world_mat = data[f"world_mat_{i}"]
